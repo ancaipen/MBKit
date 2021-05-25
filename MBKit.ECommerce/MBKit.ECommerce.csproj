@@ -135,5 +135,8 @@
       <CachedSettingsPropName>MBKit_ECommerce_ItemCardWS_ItemCard_Service</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Files\product.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

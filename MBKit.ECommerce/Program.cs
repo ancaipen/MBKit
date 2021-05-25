@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System.Text;
 using System.Linq;
 using MBKit.ECommerce.ItemCardWS;
+using System.Threading.Tasks;
 
 namespace MBKit.ECommerce
 {
@@ -17,7 +18,7 @@ namespace MBKit.ECommerce
             getMBProducts();
         }
 
-        public static void getMBProducts()
+        public static async void getMBProducts()
         {
 
             ItemCard_Service service = new ItemCard_Service();
@@ -49,43 +50,52 @@ namespace MBKit.ECommerce
             // Prints the collected data.  
             foreach (ItemCard itemCard in itemCardList)
             {
-                Console.WriteLine(itemCard.Serial_Nos);
+                if (!string.IsNullOrEmpty(itemCard.Description))
+                {
+                    //create product
+                    createProduct(itemCard.Description, itemCard.Description, 0, itemCard.Description, itemCard.Description).Wait();
+                }
             }
 
         }
 
-        public static async void createProduct(string product_name, string product_type, decimal regular_price, string description, string short_description)
+        public static async Task createProduct(string sku, string product_name, decimal regular_price, string description, string short_description)
         {
 
-            string requestUrl = ConfigurationManager.AppSettings["url"] + "/wp-json/wc/v3/products";
-            string consumerKey = ConfigurationManager.AppSettings["wc_consumerkey"];
-            string consumerSecret = ConfigurationManager.AppSettings["wc_concumersecret"];
+            string requestUrl = "https://www.mbkit.com/products/wp-json/wc/v3/products";//ConfigurationManager.AppSettings["url"] + "/wp-json/wc/v3/products";
+            string consumerKey = "ck_4fc7f819bcbd9b13fd7a7df3b4ba7b255856d20a"; //ConfigurationManager.AppSettings["wc_consumerkey"];
+            string consumerSecret = "cs_436945dab87715a5b9ba80ec4736b6c2b946780f"; //ConfigurationManager.AppSettings["wc_concumersecret"];
 
-            var values = new Dictionary<string, string>
+            string filePath = @"C:\Users\aaroncaipen\source\repos\MBKit\MBKit.ECommerce\Files\product.txt";
+            string jsonValues = System.IO.File.ReadAllText(filePath);
+
+            //replace values
+            jsonValues.Replace("[sku]", sku);
+            jsonValues.Replace("[product_name]", product_name);
+            jsonValues.Replace("[regular_price]", regular_price.ToString());
+            jsonValues.Replace("[description]", description);
+
+            var content = new StringContent(jsonValues, Encoding.UTF8, "application/json");
+
+            try
             {
-                { "name", product_name },
-                { "type", product_type },
-                { "regular_price", regular_price.ToString() },
-                { "description", description },
-                { "short_description", short_description }
-            };
 
-            string entryPut = JsonConvert.SerializeObject(values);
+                var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json ");
+                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/* ");
+                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate, br ");
 
-            var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
-            httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json ");
-            httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/* ");
-            httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate, br ");
+                var byteArray = Encoding.ASCII.GetBytes(consumerKey + ":" + consumerSecret);
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
-            var byteArray = Encoding.ASCII.GetBytes(consumerKey + ":" + consumerSecret);
-            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-
-            //httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminTokenOAuth.Token);
-
-            var content = new FormUrlEncodedContent(values);
-            var response = await httpClient.PostAsync(requestUrl, content);
-            var responseString = await response.Content.ReadAsStringAsync();
+                var response = await httpClient.PostAsync(requestUrl, content);
+                var responseString = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: " + ex.Message);
+            }
 
         }
     }

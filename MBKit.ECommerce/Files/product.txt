@@ -1,0 +1,21 @@
+{
+  "name": "[product_name]",
+  "sku": "[sku]",
+  "type": "simple",
+  "regular_price": "[regular_price]",
+  "description": "[description]",
+  "short_description": "[description]",
+  "categories": [
+    {
+      "id": 15
+    }
+  ],
+  "images": [
+    {
+      "src": "http://demo.woothemes.com/woocommerce/wp-content/uploads/sites/56/2013/06/T_2_front.jpg"
+    },
+    {
+      "src": "http://demo.woothemes.com/woocommerce/wp-content/uploads/sites/56/2013/06/T_2_back.jpg"
+    }
+  ]
+}
