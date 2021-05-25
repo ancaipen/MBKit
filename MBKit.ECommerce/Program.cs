@@ -6,6 +6,7 @@ using System.Configuration;
 using Newtonsoft.Json;
 using System.Text;
 using System.Linq;
+using MBKit.ECommerce.ItemCardWS;
 
 namespace MBKit.ECommerce
 {
@@ -13,28 +14,40 @@ namespace MBKit.ECommerce
     {
         static void Main(string[] args)
         {
+            getMBProducts();
         }
 
         public static void getMBProducts()
         {
 
-            NAV.ItemCard_PortClient service = new NAV.ItemCard_PortClient();
+            ItemCard_Service service = new ItemCard_Service();
+            service.UseDefaultCredentials = true;
 
+            int pageCountLimit = 1;
+            int pageCount = 0;
             const int fetchSize = 10;
             string bookmarkKey = null;
-            List<NAV.ItemCard> itemCardList = new List<NAV.ItemCard>();
+            List<ItemCard> itemCardList = new List<ItemCard>();
 
             // Reads NAV.ItemCard data in pages of 10.
-            NAV.ItemCard[] results = service.ReadMultiple(new NAV.ItemCard_Filter[] { }, bookmarkKey, fetchSize);
+            ItemCard[] results = service.ReadMultiple(new ItemCard_Filter[] { }, bookmarkKey, fetchSize);
+            
             while (results.Length > 0)
             {
                 bookmarkKey = results.Last().Key;
                 itemCardList.AddRange(results);
-                results = service.ReadMultiple(new NAV.ItemCard_Filter[] { }, bookmarkKey, fetchSize);
+                results = service.ReadMultiple(new ItemCard_Filter[] { }, bookmarkKey, fetchSize);
+
+                if (pageCount == pageCountLimit)
+                {
+                    break;
+                }
+
+                pageCount++;
             }
 
             // Prints the collected data.  
-            foreach (NAV.ItemCard itemCard in itemCardList)
+            foreach (ItemCard itemCard in itemCardList)
             {
                 Console.WriteLine(itemCard.Serial_Nos);
             }
