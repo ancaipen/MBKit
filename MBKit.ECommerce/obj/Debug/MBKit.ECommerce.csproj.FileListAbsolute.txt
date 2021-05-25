@@ -1,0 +1,10 @@
+C:\Users\aaroncaipen\source\repos\MBKit\MBKit.ECommerce\obj\Debug\MBKit.ECommerce.csprojAssemblyReference.cache
+C:\Users\aaroncaipen\source\repos\MBKit\MBKit.ECommerce\obj\Debug\MBKit.ECommerce.csproj.CoreCompileInputs.cache
+C:\Users\aaroncaipen\source\repos\MBKit\MBKit.ECommerce\bin\Debug\MBKit.ECommerce.exe.config
+C:\Users\aaroncaipen\source\repos\MBKit\MBKit.ECommerce\bin\Debug\MBKit.ECommerce.exe
+C:\Users\aaroncaipen\source\repos\MBKit\MBKit.ECommerce\bin\Debug\MBKit.ECommerce.pdb
+C:\Users\aaroncaipen\source\repos\MBKit\MBKit.ECommerce\bin\Debug\Newtonsoft.Json.dll
+C:\Users\aaroncaipen\source\repos\MBKit\MBKit.ECommerce\bin\Debug\Newtonsoft.Json.xml
+C:\Users\aaroncaipen\source\repos\MBKit\MBKit.ECommerce\obj\Debug\MBKit.ECommerce.csproj.CopyComplete
+C:\Users\aaroncaipen\source\repos\MBKit\MBKit.ECommerce\obj\Debug\MBKit.ECommerce.exe
+C:\Users\aaroncaipen\source\repos\MBKit\MBKit.ECommerce\obj\Debug\MBKit.ECommerce.pdb
