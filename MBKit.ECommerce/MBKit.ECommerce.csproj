@@ -94,6 +94,11 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Web References\CustomerWS\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
     <Compile Include="Web References\ItemCardWS\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -110,6 +115,14 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="Web References\CustomerWS\Customer.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\CustomerWS\Customer.wsdl" />
+    <None Include="Web References\CustomerWS\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
     <None Include="Web References\ItemCardWS\ItemCard.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
@@ -123,6 +136,17 @@
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
+    <WebReferenceUrl Include="http://192.168.0.7:7147/StageNAV/WS/Page/Customer">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\CustomerWS\</RelPath>
+      <UpdateFromURL>http://192.168.0.7:7147/StageNAV/WS/Page/Customer</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>MBKit_ECommerce_CustomerWS_Customer_Service</CachedSettingsPropName>
+    </WebReferenceUrl>
     <WebReferenceUrl Include="http://192.168.0.7:7147/StageNAV/WS/Page/ItemCard">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\ItemCardWS\</RelPath>

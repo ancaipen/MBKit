@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System.Text;
 using System.Linq;
 using MBKit.ECommerce.ItemCardWS;
+using MBKit.ECommerce.CustomerWS;
 using System.Threading.Tasks;
 
 namespace MBKit.ECommerce
@@ -15,10 +16,57 @@ namespace MBKit.ECommerce
     {
         static void Main(string[] args)
         {
-            getMBProducts();
+
+            //sync customers from NAV
+            processCustomers();
+
+            //sync products from NAV
+            //processProducts();
+
         }
 
-        public static async void getMBProducts()
+        public static async void processCustomers()
+        {
+
+            Customer_Service service = new Customer_Service();
+            service.UseDefaultCredentials = true;
+
+            int pageCountLimit = 500;
+            int pageCount = 0;
+            const int fetchSize = 10;
+            string bookmarkKey = null;
+            List<Customer> customerList = new List<Customer>();
+
+            // Reads NAV.ItemCard data in pages of 10.
+            Customer[] results = service.ReadMultiple(new Customer_Filter[] { }, bookmarkKey, fetchSize);
+
+            while (results.Length > 0)
+            {
+                bookmarkKey = results.Last().Key;
+                customerList.AddRange(results);
+                results = service.ReadMultiple(new Customer_Filter[] { }, bookmarkKey, fetchSize);
+
+                if (pageCount == pageCountLimit)
+                {
+                    break;
+                }
+
+                pageCount++;
+            }
+
+            // Prints the collected data.  
+            foreach (Customer customer in customerList)
+            {
+                if (!string.IsNullOrEmpty(customer.Name))
+                {
+                    //create customer
+                    
+                }
+            }
+
+        }
+
+        public static async void processProducts()
         {
 
             ItemCard_Service service = new ItemCard_Service();
