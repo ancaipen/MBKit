@@ -8,6 +8,8 @@ using System.Text;
 using System.Linq;
 using MBKit.ECommerce.ItemCardWS;
 using MBKit.ECommerce.CustomerWS;
+using MBKit.ECommerce.SalesOrderWS;
+using MBKit.ECommerce.SalesOrderLineWS;
 using System.Threading.Tasks;
 
 namespace MBKit.ECommerce
@@ -211,38 +213,38 @@ namespace MBKit.ECommerce
 
         }
 
-        public static async Task<List<Customer>> getOrders()
+        public static async Task<List<SalesOrder>> getOrders()
         {
 
-            Customer_Service service = new Customer_Service();
+            SalesOrder_Service service = new SalesOrder_Service();
             service.UseDefaultCredentials = true;
 
             int pageCountLimit = 5000;
             int pageCount = 0;
             const int fetchSize = 20;
             string bookmarkKey = null;
-            List<Customer> customerList = new List<Customer>();
+            List<SalesOrder> orderList = new List<SalesOrder>();
 
             // Reads NAV.ItemCard data in pages of 10.
-            Customer[] results = service.ReadMultiple(new Customer_Filter[] { }, bookmarkKey, fetchSize);
+            SalesOrder[] results = service.ReadMultiple(new SalesOrder_Filter[] { }, bookmarkKey, fetchSize);
 
             while (results.Length > 0)
             {
                 bookmarkKey = results.Last().Key;
-                customerList.AddRange(results);
-                results = service.ReadMultiple(new Customer_Filter[] { }, bookmarkKey, fetchSize);
+                orderList.AddRange(results);
+                results = service.ReadMultiple(new SalesOrder_Filter[] { }, bookmarkKey, fetchSize);
 
                 if (pageCount == pageCountLimit)
                 {
                     break;
                 }
 
-                Console.WriteLine("getCustomers() retriving customers: " + pageCount.ToString());
+                Console.WriteLine("getOrders() retriving sales orders: " + pageCount.ToString());
 
                 pageCount++;
             }
 
-            return customerList;
+            return orderList;
 
         }
 

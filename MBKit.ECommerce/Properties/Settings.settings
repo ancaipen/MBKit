@@ -8,5 +8,11 @@
     <Setting Name="MBKit_ECommerce_CustomerWS_Customer_Service" Type="(Web Service URL)" Scope="Application">
       <Value Profile="(Default)">http://akrsrv-nav.itemusa.local:7147/StageNAV/WS/Stage%20-%20MB%20Kit/Page/Customer</Value>
     </Setting>
+    <Setting Name="MBKit_ECommerce_SalesOrderWS_SalesOrder_Service" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://akrsrv-nav.itemusa.local:7147/StageNAV/WS/Stage%20-%20MB%20Kit/Page/SalesOrder</Value>
+    </Setting>
+    <Setting Name="MBKit_ECommerce_SalesOrderLineWS_SalesOrderLine_Service" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://akrsrv-nav.itemusa.local:7147/StageNAV/WS/Stage%20-%20MB%20Kit/Page/SalesOrderLine</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

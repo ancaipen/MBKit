@@ -44,5 +44,27 @@ namespace MBKit.ECommerce.Properties {
                 return ((string)(this["MBKit_ECommerce_CustomerWS_Customer_Service"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://akrsrv-nav.itemusa.local:7147/StageNAV/WS/Stage%20-%20MB%20Kit/Page/SalesO" +
+            "rder")]
+        public string MBKit_ECommerce_SalesOrderWS_SalesOrder_Service {
+            get {
+                return ((string)(this["MBKit_ECommerce_SalesOrderWS_SalesOrder_Service"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://akrsrv-nav.itemusa.local:7147/StageNAV/WS/Stage%20-%20MB%20Kit/Page/SalesO" +
+            "rderLine")]
+        public string MBKit_ECommerce_SalesOrderLineWS_SalesOrderLine_Service {
+            get {
+                return ((string)(this["MBKit_ECommerce_SalesOrderLineWS_SalesOrderLine_Service"]));
+            }
+        }
     }
 }

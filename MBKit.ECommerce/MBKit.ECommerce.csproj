@@ -107,6 +107,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="Web References\SalesOrderLineWS\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\SalesOrderWS\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -131,6 +141,22 @@
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <None Include="Web References\SalesOrderLineWS\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\SalesOrderLineWS\SalesOrderLine.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SalesOrderLineWS\SalesOrderLine.wsdl" />
+    <None Include="Web References\SalesOrderWS\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\SalesOrderWS\SalesOrder.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\SalesOrderWS\SalesOrder.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
@@ -158,12 +184,37 @@
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>MBKit_ECommerce_ItemCardWS_ItemCard_Service</CachedSettingsPropName>
     </WebReferenceUrl>
+    <WebReferenceUrl Include="http://192.168.0.7:7147/StageNAV/WS/Page/SalesOrder%3fwsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\SalesOrderWS\</RelPath>
+      <UpdateFromURL>http://192.168.0.7:7147/StageNAV/WS/Page/SalesOrder%3fwsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>MBKit_ECommerce_SalesOrderWS_SalesOrder_Service</CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="http://192.168.0.7:7147/StageNAV/WS/Page/SalesOrderLine">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\SalesOrderLineWS\</RelPath>
+      <UpdateFromURL>http://192.168.0.7:7147/StageNAV/WS/Page/SalesOrderLine</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>MBKit_ECommerce_SalesOrderLineWS_SalesOrderLine_Service</CachedSettingsPropName>
+    </WebReferenceUrl>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Files\product.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
