@@ -16,11 +16,22 @@ namespace MBKit.ECommerce
 {
     class Program
     {
+
+        public static List<Customer> customersNAV = null;
+        public static List<SalesOrder> ordersNAV = null;
+        public static List<ItemCard> itemsNAV = null;
+        public static DateTime lastRunDate;
+        public static string Payment_Terms_Code = "PAYPAL";
+        public static string Customer_Posting_Group = "DEALER";
+
         static void Main(string[] args)
         {
 
+            //retrieve all orders and customers for lookups later
+            initProcessesAndData().Wait();
+
             //sync customers from NAV
-            processCustomers().Wait();
+            //processCustomers().Wait();
 
             //sync products from NAV
             //processProducts().Wait();
@@ -28,6 +39,42 @@ namespace MBKit.ECommerce
             //sync orders from woo commerce to NAV
             processOrders().Wait();
 
+        }
+
+        public static async Task initProcessesAndData()
+        {
+            //get and set last run date
+            string filePath = ConfigurationManager.AppSettings["local_files"] + @"LastRunDate.txt";
+            string dateText = System.IO.File.ReadAllText(filePath);
+            DateTime.TryParse(dateText, out lastRunDate);
+
+            //write current datetime back to file
+            System.IO.File.WriteAllText(filePath, DateTime.Now.ToString());
+
+            //retrieve all NAV customers
+            if (customersNAV == null)
+            {
+                customersNAV = await getCustomers();
+            }
+
+            if (itemsNAV == null)
+            {
+                itemsNAV = await getItems();
+            }
+
+            //retrirve all NAV orders
+            if (ordersNAV == null)
+            {
+                ordersNAV = await getOrders();
+            }
+
+        }
+
+        public static async Task writeToLog(string errorMessage)
+        {
+            //get error log
+            string filePath = ConfigurationManager.AppSettings["local_files"] + @"ErrorLog.txt";
+            
         }
 
         public static async Task processOrders()
@@ -38,6 +85,12 @@ namespace MBKit.ECommerce
             string consumerSecret = ConfigurationManager.AppSettings["wc_concumersecret"];
 
             List<MBKit.ECommerce.Models.Order> orders = null;
+
+            SalesOrder_Service serviceSalesOrder = new SalesOrder_Service();
+            serviceSalesOrder.UseDefaultCredentials = true;
+
+            SalesOrderLine_Service serviceSalesOrderLine = new SalesOrderLine_Service();
+            serviceSalesOrderLine.UseDefaultCredentials = true;
 
             try
             {
@@ -70,7 +123,106 @@ namespace MBKit.ECommerce
                 orders = orders.Where(x => x.status != null && x.status.ToLower().Trim() != "failed").ToList();
 
                 //loop through orders and 
+                if (orders != null && orders.Count > 0)
+                {
+                                        
+                    foreach (var order in orders)
+                    {
+                        //check to make sure order is not already added in NAV
+                        var orderFound = ordersNAV.Where(x => x.Customer_Order_No != null && x.Customer_Order_No == order.order_key).FirstOrDefault();
 
+                        if (orderFound == null)
+                        {
+
+                            try
+                            {
+                                //retrieve customer
+                                Customer cust = customersNAV.Where(x => x.ExternalID != null && x.ExternalID == order.customer_id).FirstOrDefault();
+
+                                if (cust != null)
+                                {
+
+                                    DateTime _orderDate;
+                                    DateTime.TryParse(order.date_created, out _orderDate);
+
+                                    SalesOrder salesOrder = ordersNAV.Where(x => x.External_Document_No != null && x.External_Document_No == order.id).FirstOrDefault();
+
+                                    if (salesOrder == null)
+                                    {
+                                        //create new sales order
+                                        serviceSalesOrder.Create(ref salesOrder);
+                                    }
+                                                                                
+                                    salesOrder.Order_Date = _orderDate;
+                                    salesOrder.External_Document_No = order.id;
+                                    salesOrder.Payment_Terms_Code = Payment_Terms_Code;
+                                    
+                                    if (cust != null)
+                                    {
+                                        salesOrder.Bill_to_Customer_No = cust.No;
+                                        salesOrder.Sell_to_Customer_No = cust.No;
+                                    }
+
+                                    serviceSalesOrder.Update(ref salesOrder);
+
+                                    //assign line items
+                                    if (salesOrder != null && order.line_items != null && order.line_items.Count > 0)
+                                    {
+
+                                        //create sales lines for update below
+                                        int salesLineCount = order.line_items.Count;
+                                        salesOrder.SalesLines = new Sales_Order_Line[salesLineCount];
+                                        
+                                        for (int idx = 0; idx < salesLineCount; idx++)
+                                        {
+                                            salesOrder.SalesLines[idx] = new Sales_Order_Line();
+                                            serviceSalesOrder.Update(ref salesOrder);
+
+                                            var salesOrderLine = salesOrder.SalesLines[idx];
+                                            var line_item = order.line_items[idx];
+
+                                            salesOrderLine.No = line_item.sku;
+                                            salesOrderLine.Type = SalesOrderWS.Type.Item;
+                                            salesOrderLine.Document_No = salesOrder.No;
+                                            salesOrderLine.Quantity = line_item.quantity;
+
+                                            salesOrderLine.Unit_Price = line_item.price;
+                                            salesOrderLine.Unit_PriceSpecified = true;
+
+                                            salesOrderLine.Line_Amount = line_item.total;
+                                            salesOrderLine.Line_AmountSpecified = true;
+
+                                            decimal requiredLengthMM = 0;
+
+                                            if (line_item.meta_data != null)
+                                            {
+                                                foreach (var meta_data in line_item.meta_data)
+                                                {
+                                                    if (meta_data.key == "Required Length (mm)")
+                                                    {
+                                                        requiredLengthMM = Convert.ToDecimal(meta_data.value);
+                                                    }
+                                                }
+                                                
+                                            }
+                                            
+                                            serviceSalesOrder.Update(ref salesOrder);
+
+                                        }
+                                        
+                                    }
+                                }
+                                
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("ERROR: Create Sales Order: " + ex.Message);
+                            }
+
+                        }
+
+                    }
+                }
             }
 
         }
@@ -112,9 +264,6 @@ namespace MBKit.ECommerce
                 Console.WriteLine("processCustomers() ERROR: " + ex.Message);
             }
 
-            //retrieve all NAV customers
-            List<Customer> customersNAV = await getCustomers();
-
             if (customersWoo != null && customersNAV != null)
             {
                 //create new customers
@@ -124,7 +273,7 @@ namespace MBKit.ECommerce
                     {
 
                         //check to make sure username is not already found
-                        Customer cust = customersNAV.Where(x => x.ExternalID != null && x.ExternalID == customerWoo.username).FirstOrDefault();
+                        Customer cust = customersNAV.Where(x => x.ExternalID != null && x.ExternalID == customerWoo.id).FirstOrDefault();
 
                         //check by email
                         if (cust == null && !string.IsNullOrEmpty(customerWoo.email))
@@ -139,8 +288,11 @@ namespace MBKit.ECommerce
                         }
 
                         cust.Name = customerWoo.first_name + " " + customerWoo.last_name;
-                        cust.ExternalID = customerWoo.username;
+                        cust.ExternalID = customerWoo.id;
+                        cust.Search_Name = customerWoo.username;
                         cust.E_Mail = customerWoo.email;
+                        cust.Customer_Posting_Group = Customer_Posting_Group; //this is required for sales orders
+                        cust.Payment_Terms_Code = Payment_Terms_Code;
 
                         if (customerWoo.billing != null)
                         {
@@ -157,9 +309,10 @@ namespace MBKit.ECommerce
                             }
 
                             cust.Phone_No = customerWoo.billing.phone;
+                            
                         }
 
-                        if (cust == null)
+                        if (string.IsNullOrEmpty(cust.No))
                         {
                             service.Create(ref cust);
                         }
@@ -174,6 +327,10 @@ namespace MBKit.ECommerce
                         Console.WriteLine("processCustomers() ERROR: " + ex.Message);
                     }
                 }
+
+                //refresh customer info
+                customersNAV = await getCustomers();
+
             }
 
         }
@@ -195,16 +352,25 @@ namespace MBKit.ECommerce
 
             while (results.Length > 0)
             {
-                bookmarkKey = results.Last().Key;
-                customerList.AddRange(results);
-                results = service.ReadMultiple(new Customer_Filter[] { }, bookmarkKey, fetchSize);
 
-                if (pageCount == pageCountLimit)
+                try
                 {
-                    break;
-                }
 
-                Console.WriteLine("getCustomers() retriving customers: " + pageCount.ToString());
+                    if (pageCount == pageCountLimit)
+                    {
+                        break;
+                    }
+
+                    bookmarkKey = results.Last().Key;
+                    customerList.AddRange(results);
+                    results = service.ReadMultiple(new Customer_Filter[] { }, bookmarkKey, fetchSize);
+                    
+                    Console.WriteLine("getCustomers() retriving customers: " + pageCount.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("ERROR: " + pageCount.ToString() + " getCustomers() " + ex.Message);
+                }             
 
                 pageCount++;
             }
@@ -230,21 +396,74 @@ namespace MBKit.ECommerce
 
             while (results.Length > 0)
             {
-                bookmarkKey = results.Last().Key;
-                orderList.AddRange(results);
-                results = service.ReadMultiple(new SalesOrder_Filter[] { }, bookmarkKey, fetchSize);
-
-                if (pageCount == pageCountLimit)
+                try
                 {
-                    break;
+
+                    if (pageCount == pageCountLimit)
+                    {
+                        break;
+                    }
+
+                    bookmarkKey = results.Last().Key;
+                    orderList.AddRange(results);
+                    results = service.ReadMultiple(new SalesOrder_Filter[] { }, bookmarkKey, fetchSize);
+
+                    Console.WriteLine("getOrders() retriving sales orders: " + pageCount.ToString());
+
                 }
-
-                Console.WriteLine("getOrders() retriving sales orders: " + pageCount.ToString());
-
+                catch (Exception ex)
+                {
+                    Console.WriteLine("ERROR: " + pageCount.ToString() + " getOrders() " + ex.Message);
+                }
+                
                 pageCount++;
             }
 
             return orderList;
+
+        }
+
+        public static async Task<List<ItemCard>> getItems()
+        {
+
+            ItemCard_Service service = new ItemCard_Service();
+            service.UseDefaultCredentials = true;
+
+            int pageCountLimit = 1000;
+            int pageCount = 0;
+            const int fetchSize = 20;
+            string bookmarkKey = null;
+            List<ItemCard> itemList = new List<ItemCard>();
+
+            // Reads NAV.ItemCard data in pages of 10.
+            ItemCard[] results = service.ReadMultiple(new ItemCard_Filter[] { }, bookmarkKey, fetchSize);
+
+            while (results.Length > 0)
+            {
+                try
+                {
+
+                    if (pageCount == pageCountLimit)
+                    {
+                        break;
+                    }
+
+                    bookmarkKey = results.Last().Key;
+                    itemList.AddRange(results);
+                    results = service.ReadMultiple(new ItemCard_Filter[] { }, bookmarkKey, fetchSize);
+                                        
+                    Console.WriteLine("getItems() retriving inventory items: " + pageCount.ToString());
+                }
+                catch(Exception ex) 
+                {
+                    Console.WriteLine("ERROR: " + pageCount.ToString() + " getItems() " + ex.Message);
+                    break;
+                }
+
+                pageCount++;
+            }
+
+            return itemList;
 
         }
 
@@ -296,7 +515,7 @@ namespace MBKit.ECommerce
             string consumerKey = ConfigurationManager.AppSettings["wc_consumerkey"];
             string consumerSecret = ConfigurationManager.AppSettings["wc_concumersecret"];
 
-            string filePath = @"C:\Users\aaroncaipen\source\repos\MBKit\MBKit.ECommerce\Files\product.txt";
+            string filePath = ConfigurationManager.AppSettings["local_files"] + @"product.txt";
             string jsonValues = System.IO.File.ReadAllText(filePath);
 
             //replace values

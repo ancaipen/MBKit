@@ -73,6 +73,40 @@ namespace MBKit.ECommerce.Models
         [JsonProperty("price")]
         public decimal price { get; set; }
 
+        [JsonProperty("meta_data")]
+        public List<OrderLineMetaData> meta_data { get; set; }
+               
+
     }
+
+    public class OrderLineMetaData
+    {
+        [JsonProperty("key")]
+        public string key { get; set; }
+
+        [JsonProperty("value")]
+        public object value { get; set; }
+    }
+
+    public class OrderLineKeyValue
+    {
+        [JsonProperty("id")]
+        public string id { get; set; }
+
+        [JsonProperty("key")]
+        public string key { get; set; }
+
+        [JsonProperty("value")]
+        public string value { get; set; }
+
+        [JsonProperty("display_key")]
+        public string display_key { get; set; }
+
+        [JsonProperty("display_value")]
+        public decimal display_value { get; set; }
+
+    }
+
+
 
 }

@@ -208,6 +208,8 @@
     </WebReferenceUrl>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Files\ErrorLog.txt" />
+    <Content Include="Files\LastRunDate.txt" />
     <Content Include="Files\product.txt" />
   </ItemGroup>
   <ItemGroup>
