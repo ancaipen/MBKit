@@ -70,11 +70,21 @@ namespace MBKit.ECommerce
 
         }
 
-        public static async Task writeToLog(string errorMessage)
+        public static async Task writeToLog(string errorMessage, bool writeToConsole = true)
         {
             //get error log
             string filePath = ConfigurationManager.AppSettings["local_files"] + @"ErrorLog.txt";
-            
+
+            //write to console window
+            if (writeToConsole)
+            {
+                Console.WriteLine(errorMessage);
+            }
+
+            //write to error file
+            string errorFileMessage = DateTime.Now.ToString() + " -- " + errorMessage;
+            System.IO.File.AppendAllText(filePath, errorFileMessage);
+
         }
 
         public static async Task processOrders()
@@ -114,7 +124,8 @@ namespace MBKit.ECommerce
             }
             catch (Exception ex)
             {
-                Console.WriteLine("processOrders() ERROR: " + ex.Message);
+                string errMsg = "processOrders() | WooCommerce Order Retrieval | ERROR: " + ex.Message;
+                writeToLog(errMsg).Wait();
             }
 
             if (orders != null)
@@ -215,8 +226,9 @@ namespace MBKit.ECommerce
                                 
                             }
                             catch (Exception ex)
-                            {
-                                Console.WriteLine("ERROR: Create Sales Order: " + ex.Message);
+                            {   
+                                string errMsg = "processOrders() | NAV Order Create | ERROR: " + ex.Message;
+                                writeToLog(errMsg).Wait();
                             }
 
                         }
@@ -261,7 +273,8 @@ namespace MBKit.ECommerce
             }
             catch (Exception ex)
             {
-                Console.WriteLine("processCustomers() ERROR: " + ex.Message);
+                string errMsg = "processCustomers() | WooCommerce Customer Retrieval | ERROR: " + ex.Message;
+                writeToLog(errMsg).Wait();
             }
 
             if (customersWoo != null && customersNAV != null)
@@ -324,7 +337,8 @@ namespace MBKit.ECommerce
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("processCustomers() ERROR: " + ex.Message);
+                        string errMsg = "processCustomers() | NAV Customer Upsert | ERROR: " + ex.Message;
+                        writeToLog(errMsg).Wait();
                     }
                 }
 
@@ -369,7 +383,8 @@ namespace MBKit.ECommerce
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("ERROR: " + pageCount.ToString() + " getCustomers() " + ex.Message);
+                    string errMsg = "ERROR: " + pageCount.ToString() + " getCustomers() " + ex.Message;
+                    writeToLog(errMsg).Wait();
                 }             
 
                 pageCount++;
@@ -413,7 +428,8 @@ namespace MBKit.ECommerce
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("ERROR: " + pageCount.ToString() + " getOrders() " + ex.Message);
+                    string errMsg = "ERROR: " + pageCount.ToString() + " getOrders() " + ex.Message;
+                    writeToLog(errMsg).Wait();
                 }
                 
                 pageCount++;
@@ -456,7 +472,8 @@ namespace MBKit.ECommerce
                 }
                 catch(Exception ex) 
                 {
-                    Console.WriteLine("ERROR: " + pageCount.ToString() + " getItems() " + ex.Message);
+                    string errMsg = "ERROR: " + pageCount.ToString() + " getItems() " + ex.Message;
+                    writeToLog(errMsg).Wait();
                     break;
                 }
 
