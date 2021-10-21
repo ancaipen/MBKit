@@ -67,6 +67,8 @@ namespace MBKit.ECommerce
                 //remove failed orders
                 orders = orders.Where(x => x.status != null && x.status.ToLower().Trim() != "failed").ToList();
 
+                //loop through orders and 
+
             }
 
         }
@@ -177,6 +179,41 @@ namespace MBKit.ECommerce
         public static async Task<List<Customer>> getCustomers()
         {
                         
+            Customer_Service service = new Customer_Service();
+            service.UseDefaultCredentials = true;
+
+            int pageCountLimit = 5000;
+            int pageCount = 0;
+            const int fetchSize = 20;
+            string bookmarkKey = null;
+            List<Customer> customerList = new List<Customer>();
+
+            // Reads NAV.ItemCard data in pages of 10.
+            Customer[] results = service.ReadMultiple(new Customer_Filter[] { }, bookmarkKey, fetchSize);
+
+            while (results.Length > 0)
+            {
+                bookmarkKey = results.Last().Key;
+                customerList.AddRange(results);
+                results = service.ReadMultiple(new Customer_Filter[] { }, bookmarkKey, fetchSize);
+
+                if (pageCount == pageCountLimit)
+                {
+                    break;
+                }
+
+                Console.WriteLine("getCustomers() retriving customers: " + pageCount.ToString());
+
+                pageCount++;
+            }
+
+            return customerList;
+
+        }
+
+        public static async Task<List<Customer>> getOrders()
+        {
+
             Customer_Service service = new Customer_Service();
             service.UseDefaultCredentials = true;
 
