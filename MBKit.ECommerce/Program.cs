@@ -31,10 +31,10 @@ namespace MBKit.ECommerce
             initProcessesAndData().Wait();
 
             //sync customers from NAV
-            //processCustomers().Wait();
+            processCustomers().Wait();
 
             //sync products from NAV
-            //processProducts().Wait();
+            processProducts().Wait();
 
             //sync orders from woo commerce to NAV
             processOrders().Wait();
