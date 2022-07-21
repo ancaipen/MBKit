@@ -112,7 +112,8 @@ namespace MBKit.ECommerce
                 httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/* ");
                 httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate, br ");
 
-                var byteArray = Encoding.ASCII.GetBytes(consumerKey + ":" + consumerSecret);
+                string authCode = consumerKey + ":" + consumerSecret;
+                var byteArray = Encoding.ASCII.GetBytes(authCode);
                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
                 var response = await httpClient.GetAsync(requestUrl);
@@ -161,6 +162,7 @@ namespace MBKit.ECommerce
                                     if (salesOrder == null)
                                     {
                                         //create new sales order
+                                        salesOrder = new SalesOrder();
                                         serviceSalesOrder.Create(ref salesOrder);
                                     }
                                                                                 
@@ -242,7 +244,7 @@ namespace MBKit.ECommerce
         public static async Task processCustomers()
         {
             //get all orders from woocommerce
-            string requestUrl = ConfigurationManager.AppSettings["url"] + "customers";
+            string requestUrl = ConfigurationManager.AppSettings["url"] + "customers?role=all";
             string consumerKey = ConfigurationManager.AppSettings["wc_consumerkey"];
             string consumerSecret = ConfigurationManager.AppSettings["wc_concumersecret"];
 
@@ -306,7 +308,7 @@ namespace MBKit.ECommerce
                         cust.E_Mail = customerWoo.email;
                         cust.Customer_Posting_Group = Customer_Posting_Group; //this is required for sales orders
                         cust.Payment_Terms_Code = Payment_Terms_Code;
-
+                        
                         if (customerWoo.billing != null)
                         {
 
